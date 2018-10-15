@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Ripple from 'react-native-material-ripple';
 import { TextField } from 'react-native-material-textfield';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import DropdownItem from '../item';
 import styles from './styles';
@@ -185,6 +186,9 @@ export default class Dropdown extends PureComponent {
       selected: -1,
       modal: false,
       value,
+      isUpArrowVisible: false, 
+      isDownArrowVisible: true, 
+      itemsCount: 0,
     };
   }
 
@@ -637,6 +641,46 @@ export default class Dropdown extends PureComponent {
     );
   }
 
+  handleIsUpArrowVisible = (isVisible) => {
+    this.setState({
+      isUpArrowVisible: isVisible,
+    });
+  };
+
+  handleIsDownArrowVisible = (isVisible) => {
+    this.setState({
+      isDownArrowVisible: isVisible,
+    });
+  }
+
+  onViewableItemsChanged = ({viewableItems, changed}, itemCount) => {
+    const { data } = this.props; 
+    
+    if (viewableItems.findIndex((viewableItem) => viewableItem.index === 0) > -1) {
+      // Show down hide up 
+      this.setState({
+        isUpArrowVisible: false, 
+        isDownArrowVisible: true, 
+      });
+    } else if (viewableItems.findIndex((viewableItem) => viewableItem.index === data.length - 1) > -1) {
+      // Hide down show up 
+      this.setState({
+        isUpArrowVisible: true, 
+        isDownArrowVisible: false, 
+      });
+    } else {
+      // Hide down show up 
+      this.setState({
+        isUpArrowVisible: true, 
+        isDownArrowVisible: true, 
+      });
+    }
+    
+
+    // Find index 0 or last 
+    // Show or hide arrows 
+  }
+
   render() {
     let {
       renderBase,
@@ -732,7 +776,7 @@ export default class Dropdown extends PureComponent {
             {this.renderRipple()}
           </View>
         </TouchableWithoutFeedback>
-
+        
         <Modal
           visible={modal}
           transparent={true}
@@ -748,6 +792,12 @@ export default class Dropdown extends PureComponent {
               style={[styles.picker, pickerStyle, pickerStyleOverrides]}
               onStartShouldSetResponder={() => true}
             >
+
+              {visibleItemCount < itemCount && this.state.isUpArrowVisible &&
+                <View style={{ alignItems: 'flex-end',}}>
+                  <Icon color='grey' name='arrow-up'/>
+                </View> 
+              }
               <FlatList
                 ref={this.updateScrollRef}
                 data={data}
@@ -755,8 +805,15 @@ export default class Dropdown extends PureComponent {
                 renderItem={this.renderItem}
                 keyExtractor={this.keyExtractor}
                 scrollEnabled={visibleItemCount < itemCount}
+                showsVerticalScrollIndicator={true}
                 contentContainerStyle={styles.scrollContainer}
+                onViewableItemsChanged={this.onViewableItemsChanged}
               />
+              {visibleItemCount < itemCount && this.state.isDownArrowVisible &&
+                <View style={{ alignItems: 'flex-end',}}>
+                  <Icon color='grey' name='arrow-down'/>
+                </View> 
+              }
             </View>
           </Animated.View>
         </Modal>
