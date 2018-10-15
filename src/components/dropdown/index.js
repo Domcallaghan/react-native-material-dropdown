@@ -653,32 +653,27 @@ export default class Dropdown extends PureComponent {
     });
   }
 
-  onViewableItemsChanged = ({viewableItems, changed}, itemCount) => {
+  onViewableItemsChanged = ({viewableItems}) => {
     const { data } = this.props; 
     
+    // Begin reached
     if (viewableItems.findIndex((viewableItem) => viewableItem.index === 0) > -1) {
-      // Show down hide up 
       this.setState({
         isUpArrowVisible: false, 
         isDownArrowVisible: true, 
       });
-    } else if (viewableItems.findIndex((viewableItem) => viewableItem.index === data.length - 1) > -1) {
-      // Hide down show up 
+    } // End reached 
+    else if (viewableItems.findIndex((viewableItem) => viewableItem.index === data.length - 1) > -1) {
       this.setState({
         isUpArrowVisible: true, 
         isDownArrowVisible: false, 
       });
     } else {
-      // Hide down show up 
       this.setState({
         isUpArrowVisible: true, 
         isDownArrowVisible: true, 
       });
     }
-    
-
-    // Find index 0 or last 
-    // Show or hide arrows 
   }
 
   render() {
